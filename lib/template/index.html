@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hmw</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+</head>
+    <body>
+        <div class="sidebar">
+            <a href="/">search</a>
+            <a href="/">upload</a>
+        </div>
+        <div class="table-content">
+            <input type="text" placeholder="input text"><button type="button">search</button><br>
+            <table>
+                <tr>
+                    <th class="kw">kw</th>
+                    <th class="docname">docname</th>
+                    <th class="lang">lang</th>
+                    <th class="url">url</th>
+                </tr>
+                {% if data.status != "error" %}
+                {% for item in data.info %}
+                <tr>
+                    <td>{{ item.kw }}</td>
+                    <td>{{ item.docname }}</td>
+                    <td>{{ item.lang }}</td>
+                    <td><a href="{{ item.url }}">URL</a></td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                nothing found
+                {% endif %}
+            </table>
+        </div>
+    </body>
+</html>
