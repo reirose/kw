@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script></script>
+{% endblock %}
+
+{% block body %}
+<div class="table-content">
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" id="myFile" name="file" accept=".doc, .docx, .htm, .html, .jpeg, .jpg, .ppt, .pptx, .pdf,
+        .rtf, .txt" value="select file">
+        <input type="submit" value="Upload">
+    </form>
+    {% if data.response_code == "error" %}
+    <p style="color: red">error loading {{ data.data.filename }}</p>
+    {% endif %}
+    {% if data.response_code == "success" %}
+    <p style="color: green">uploaded {{ data.data.filename }} successfully</p>
+    {% endif %}
+</div>
+{% endblock %}

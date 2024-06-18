@@ -3,4 +3,5 @@ from fastapi.templating import Jinja2Templates
 
 app = FastAPI(title="diplom",
               version="indev")
-templates = Jinja2Templates(directory="lib/template")
+templates = Jinja2Templates(directory="templates")
+files = "files"

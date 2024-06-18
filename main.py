@@ -1,10 +1,16 @@
 import uvicorn
+import os
 
-from fastapi import Request
-from fastapi.responses import HTMLResponse, FileResponse
+from typing import Optional
+
+from fastapi import Request, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from bin.init import app, templates
+from bin.data_processing import get_data
+from bin.db_init import client
+from bin.init import app, templates, files
+from bin.upload_file import upload_file
 
 
 @app.on_event("startup")
@@ -14,18 +20,56 @@ async def startup() -> None:
 
 @app.on_event("shutdown")
 async def shutdown() -> None:
+    client.close()
     print("App stopped")
 
 
-@app.get('/')
-async def root(request: Request, response_class=HTMLResponse):
-    data = {"status": "ok",
-            "info": [{"kw": "hello", "docname": "world", "lang": "ru", "url": "/"},
-                     {"kw": "1", "docname": "2", "lang": "ru", "url": "/"}]}
+@app.get("/download/{filename}")
+async def download_file(filename: str):
+    file_path = os.path.join(files, filename)
+    if os.path.isfile(file_path):
+        return FileResponse(path=file_path, filename=filename, media_type='application/octet-stream')
+    else:
+        raise HTTPException(status_code=404, detail="File not found")
+
+
+@app.get('/search', response_class=templates.TemplateResponse)
+@app.get('/', response_class=templates.TemplateResponse)
+async def root(request: Request, q: Optional[str] = None):
+    data = {"status": "error" if not q else "ok",
+            "info": get_data(q.lower()) if q else None}
+    if not data["info"]:
+        data["status"] = "error"
+
     return templates.TemplateResponse(
         name="index.html",
         context={"data": data,
                  "request": request}
+    )
+
+
+@app.get("/upload", response_class=templates.TemplateResponse)
+async def root(request: Request):
+    return templates.TemplateResponse(
+        name="upload.html",
+        context={"request": request,
+                 "data": {"response_code": "ok", "error": None, "data": None}}
+    )
+
+
+@app.post('/upload')
+async def upload(request: Request, file: UploadFile = File(...)):
+    data = await upload_file(file)
+    if data.error:
+        return templates.TemplateResponse(
+            name="upload.html",
+            context={"request": request,
+                     "data": data}
+        )
+    return templates.TemplateResponse(
+        name="upload.html",
+        context={"request": request,
+                 "data": data}
     )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
