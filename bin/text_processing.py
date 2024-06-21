@@ -1,4 +1,3 @@
-import json
 from typing import AnyStr
 
 import spacy
@@ -8,7 +7,7 @@ def process_text(text: AnyStr):
     nlp = spacy.load('en_core_web_md')
     used_tokens = []
     used_ents = []
-    used_pos = ["ADJ", "NOUN", "PROPN"]  # "VERB", "ADV",
+    used_pos = ["ADJ", "NOUN", "PROPN"]
 
     doc = nlp(text)
 

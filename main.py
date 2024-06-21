@@ -10,7 +10,6 @@ from fastapi.staticfiles import StaticFiles
 from bin.data_processing import get_data
 from bin.db_init import client
 from bin.init import app, templates, files
-from bin.text_processing import process_text
 from bin.upload_file import upload_file, UploadResponse
 
 

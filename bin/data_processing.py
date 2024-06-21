@@ -1,15 +1,5 @@
 from bin.db_init import kw_db
 
-"""
-doc example:
-{
-    "keyword": "example",
-    "docname": "Example Title",
-    "lang": "en",
-    "url": "/doc_example.docx"
-}
-"""
-
 
 def get_data(kw: str) -> list | None:
     db_response = kw_db.find({"keyword": {"$in": [kw]}}) if kw else kw_db.find({})

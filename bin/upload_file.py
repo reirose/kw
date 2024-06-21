@@ -20,7 +20,7 @@ async def upload_file(file: File):
     file.filename = f"{filename_wo_ext}_{str(int(time()))}.{ext}"
     contents = await file.read()
     kw = process_text(contents.decode("utf-8"))
-    kw_db.insert_one({"keyword": kw, "docname": file.filename, "lang": "TS", "url": f"download/{file.filename}"})
+    kw_db.insert_one({"keyword": kw, "docname": file.filename, "lang": "", "url": f"download/{file.filename}"})
 
     try:
         with open(f"files/{file.filename}", "w+b") as f:
