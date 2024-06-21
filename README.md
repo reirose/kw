@@ -19,5 +19,5 @@
 * Запустить клиент и перейти на `localhost:27015`:
     ```commandline
     python main.py
-```
+    ```
 ![screenshot](./static/img.png "Client main page")
