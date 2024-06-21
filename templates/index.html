@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Поиск{% endblock %}
+
 {% block scripts %}
 <script>
             function getQuery() {
@@ -15,28 +17,33 @@
 
 {% block body %}
 <div class="table-content">
-    <input type="text" placeholder="input text" id="search_query">
-    <button type="submit" id="search" onclick="redirectToResult()">search</button>
+    <div class="search-container">
+    <input type="text" placeholder="Введите запрос..." class="search-input" id="search_query">
+    <button type="submit" id="search" class="search-button" onclick="redirectToResult()">
+        <span class="search-icon">🔍</span>
+        <span class="search-text">Поиск</span>
+    </button>
+    </div>
     <br><br>
     {% if data.status != "error" %}
         <table>
             <tr>
-                <th class="keyword">kwords</th>
-                <th class="docname">docname</th>
-                <th class="lang">lang</th>
-                <th class="url">url</th>
+                <th class="keyword">Ключевые слова</th>
+                <th class="docname">Название документа</th>
+                <th class="lang">Язык</th>
+                <th class="url">Ссылка</th>
             </tr>
             {% for item in data.info %}
                 <tr>
                     <td>{{ item.keyword }}</td>
                     <td>{{ item.docname }}</td>
                     <td>{{ item.lang }}</td>
-                    <td><a href="{{ item.url }}">URL</a></td>
+                    <td><a href="{{ item.url }}">Ссылка</a></td>
                 </tr>
             {% endfor %}
         </table>
     {% else %}
-        empty input or nothing found
+    <span class="nothing-found-text">ничего не найдено</span>
     {% endif %}
 </div>
 {% endblock %}

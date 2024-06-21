@@ -12,7 +12,7 @@ doc example:
 
 
 def get_data(kw: str) -> list | None:
-    db_response = kw_db.find({"keyword": {"$in": [kw]}})
+    db_response = kw_db.find({"keyword": {"$in": [kw]}}) if kw else kw_db.find({})
     response = [doc for doc in db_response]
     for i in response:
         i["keyword"] = ", ".join(i.get("keyword"))

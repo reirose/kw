@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% block title %}Загрузка файла{% endblock %}
+
 {% block scripts %}
 <script></script>
 {% endblock %}
@@ -9,13 +11,14 @@
     <form action="/upload" method="post" enctype="multipart/form-data">
         <input type="file" id="myFile" name="file" accept=".doc, .docx, .htm, .html, .jpeg, .jpg, .ppt, .pptx, .pdf,
         .rtf, .txt" value="select file">
-        <input type="submit" value="Upload">
+        <input type="submit" value="Загрузить">
     </form>
     {% if data.response_code == "error" %}
-    <p style="color: red">error loading {{ data.data.filename }}</p>
+    <p style="color: red">Ошибка при загрузке {{ data.data.filename }}</p>
     {% endif %}
     {% if data.response_code == "success" %}
-    <p style="color: green">uploaded {{ data.data.filename }} successfully</p>
+    <p style="color: green">Загрузка {{ data.data.filename }} завершена</p>
+    <p style="color: white">Ключевые слова: {{data.data.keywords}}</p>
     {% endif %}
 </div>
 {% endblock %}

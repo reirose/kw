@@ -1,19 +1,32 @@
+import json
 from typing import AnyStr
-from string import punctuation
+
+import spacy
 
 
 def process_text(text: AnyStr):
-    text = text.decode("utf-8")
-    seg = text.split(" ")
-    n = len(seg)
+    nlp = spacy.load('en_core_web_md')
+    used_tokens = []
+    used_ents = []
+    used_pos = ["ADJ", "NOUN", "PROPN"]  # "VERB", "ADV",
+
+    doc = nlp(text)
+
+    for token in doc:
+        if token.pos_ in used_pos:
+            used_tokens.append(token)
+
+    for ent in doc.ents:
+        used_ents.append(ent.text)
+
     freq = {}
+    n = len(used_tokens)
+    for x in used_tokens:
+        freq[x.lemma_] = used_tokens.count(x) / n
 
-    for i, token in enumerate(seg):
-        if any([token[-1] in x for x in punctuation]):
-            seg[i] = token[:-1]
+    freq = dict(sorted(freq.items(), key=lambda item: item[0], reverse=True))
 
-    for token in seg:
-        freq[token] = seg.count(token) / n
+    kws = list(freq.keys())[:int(len(list(freq.items()))/2)] + [x.lower() for x in used_ents]
+    kws.sort()
 
-    sorted_by_keys = dict(sorted(freq.items(), key=lambda item: item[0], reverse=True))
-    print(list(sorted_by_keys.items())[:5])
+    return kws
