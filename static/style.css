@@ -63,6 +63,7 @@ input.word_input {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    color: #AAA;
     width: 600px;
     height: 70px;
     border-radius: 40px;
