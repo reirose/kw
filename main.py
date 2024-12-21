@@ -37,7 +37,8 @@ async def download_file(filename: str):
 @app.get('/', response_class=templates.TemplateResponse)
 async def root(request: Request, q: Optional[str] = ""):
     data = {"status": "ok",
-            "info": get_data(q.lower())}
+            "info": get_data(q.lower()),
+            "query": q}
     if not data["info"]:
         data["status"] = "error"
 
@@ -59,7 +60,7 @@ async def root(request: Request):
 
 @app.post('/upload')
 async def upload(request: Request, file: UploadFile = File(...)):
-    if not any([file.filename, file.size]):
+    if not any([file.filename, file.__sizeof__()]):
         data = UploadResponse("error", None, {"filename": "файла: файл не выбран."})
         return templates.TemplateResponse(
             name="upload.html",

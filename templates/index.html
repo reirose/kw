@@ -18,7 +18,7 @@
 {% block body %}
 <div class="table-content">
     <div class="search-container">
-    <input type="text" placeholder="Введите запрос..." class="search-input" id="search_query">
+    <input type="text" placeholder="Введите запрос..." class="search-input" id="search_query" value="{{ data.query }}">
     <button type="submit" id="search" class="search-button" onclick="redirectToResult()">
         <span class="search-icon">🔍</span>
         <span class="search-text">Поиск</span>
@@ -31,6 +31,7 @@
                 <th class="keyword">Ключевые слова</th>
                 <th class="docname">Название документа</th>
                 <th class="lang">Язык</th>
+                <th class="date">Дата</th>
                 <th class="url">Ссылка</th>
             </tr>
             {% for item in data.info %}
@@ -38,6 +39,7 @@
                     <td>{{ item.keyword }}</td>
                     <td>{{ item.docname }}</td>
                     <td>{{ item.lang }}</td>
+                    <td>{{ item.date }}</td>
                     <td><a href="{{ item.url }}">Ссылка</a></td>
                 </tr>
             {% endfor %}
