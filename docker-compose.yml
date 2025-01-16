@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Сервис для FastAPI
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "27015:27015"  # Порт для FastAPI
+    volumes:
+      - .:/app  # Монтирование текущей директории в контейнер
+    environment:
+      - MONGO_HOST=mongodb
+      - MONGO_PORT=27017
+    depends_on:
+      - mongodb
+
+  # Сервис для MongoDB
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"  # Порт для MongoDB
+    volumes:
+      - mongodb_data:/data/db  # Сохранение данных MongoDB
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+
+volumes:
+  mongodb_data:  # Том для хранения данных MongoDB
