@@ -29,3 +29,7 @@ services:
 
 volumes:
   mongodb_data:  # Том для хранения данных MongoDB
+
+networks:
+  mynetwork:
+    driver: bridge
