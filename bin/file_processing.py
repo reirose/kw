@@ -1,9 +1,11 @@
+import subprocess
+
 from langdetect import detect
 from PIL import Image
 import pytesseract
 import openpyxl
 import PyPDF2
-import textract
+# import os
 from docx import Document
 from bs4 import BeautifulSoup
 
@@ -124,11 +126,22 @@ def extract_text_from_txt(file_path):
 
 def extract_text_from_doc(file_path):
     try:
-        text = textract.process(file_path).decode('utf-8')
-        return text
-    except Exception as e:
-        print("Error while extracting text from doc:", e)
-        return ""
+        # Try using antiword
+        result = subprocess.run(['antiword', file_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            return result.stdout
+
+        # If antiword fails, try catdoc as fallback
+        result = subprocess.run(['catdoc', file_path], capture_output=True, text=True)
+        if result.returncode == 0:
+            return result.stdout
+
+        raise RuntimeError("Both antiword and catdoc failed")
+    except FileNotFoundError:
+        raise RuntimeError("Please install antiword or catdoc: \n"
+                           "For Ubuntu/Debian: sudo apt-get install antiword catdoc\n"
+                           "For CentOS/RHEL: sudo yum install antiword catdoc\n"
+                           "For Fedora: sudo dnf install antiword catdoc")
 
 
 

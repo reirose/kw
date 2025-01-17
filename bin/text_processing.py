@@ -1,4 +1,4 @@
-from typing import AnyStr, List
+from typing import List
 from deep_translator import GoogleTranslator
 import spacy
 from collections import Counter
