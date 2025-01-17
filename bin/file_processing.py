@@ -1,5 +1,6 @@
 import subprocess
 
+import chardet
 from langdetect import detect
 from PIL import Image
 import pytesseract
@@ -10,10 +11,11 @@ from docx import Document
 from bs4 import BeautifulSoup
 
 # Путь к локальному файлу Tesseract
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+pytesseract.pytesseract.tesseract_cmd = r'.\Tesseract-OCR\tesseract.exe'
 
 
 def detect_language(text):
+    print(text)
     try:
         lang = detect(text)
         return lang
@@ -79,20 +81,6 @@ def extract_text_from_pdf(file_path):
         return ""
 
 
-# def extract_text_from_pptx(file_path):
-#     try:
-#         prs = Presentation(file_path)
-#         text = ""
-#         for slide in prs.slides:
-#             for shape in slide.shapes:
-#                 if hasattr(shape, "text"):
-#                     text += shape.text + "\n"
-#         return text
-#     except Exception as e:
-#         print("Error while extracting text from PowerPoint:", e)
-#         return ""
-
-
 def extract_text_from_csv(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -116,7 +104,11 @@ def extract_text_from_html(file_path):
 
 def extract_text_from_txt(file_path):
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, 'rb') as file:
+            raw_data = file.read()
+            detected = chardet.detect(raw_data)
+            encoding = detected['encoding']
+        with open(file_path, 'r', encoding=encoding) as file:
             text = file.read()
         return text
     except Exception as e:
@@ -126,12 +118,10 @@ def extract_text_from_txt(file_path):
 
 def extract_text_from_doc(file_path):
     try:
-        # Try using antiword
         result = subprocess.run(['antiword', file_path], capture_output=True, text=True)
         if result.returncode == 0:
             return result.stdout
 
-        # If antiword fails, try catdoc as fallback
         result = subprocess.run(['catdoc', file_path], capture_output=True, text=True)
         if result.returncode == 0:
             return result.stdout
@@ -169,15 +159,3 @@ def extract_text_and_language(file_path):
     text = file_type_func[file_type](file_path)
     lang = detect_language(text)
     return text, lang
-
-# def extract_text_from_pdf(file_path):
-#     try:
-#         with open(file_path, 'rb') as file:
-#             reader = PdfReader(file)
-#             text = ""
-#             for page in reader.pages:
-#                 text += page.extract_text()
-#             return text
-#     except Exception as e:
-#         print("Error while extracting text from PDF:", e)
-#         return ""

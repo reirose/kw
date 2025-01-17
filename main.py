@@ -60,7 +60,8 @@ async def root(request: Request):
 
 @app.post('/upload')
 async def upload(request: Request, file: UploadFile = File(...)):
-    if not any([file.filename, file.__sizeof__()]):
+    print(file.size)
+    if not all([file.filename, file.size]):
         data = UploadResponse("error", None, {"filename": "файла: файл не выбран."})
         return templates.TemplateResponse(
             name="upload.html",
@@ -85,4 +86,4 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 if __name__ == "__main__":
     uvicorn.run(app,
                 host='0.0.0.0',
-                port=27015)
+                port=8000)

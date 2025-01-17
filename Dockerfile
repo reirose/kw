@@ -17,4 +17,4 @@ COPY . .
 ENV PYTHONUNBUFFERED=1
 
 # Команда для запуска FastAPI
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "27015", "--reload"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
