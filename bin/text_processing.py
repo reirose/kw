@@ -1,7 +1,22 @@
 from typing import List
 from deep_translator import GoogleTranslator
-import spacy
-from collections import Counter
+# import spacy
+# from collections import Counter
+
+from itertools import groupby
+import torch
+from transformers import T5ForConditionalGeneration, T5Tokenizer
+
+tokenizer, model = None, None
+
+async def initialize_model(model_name="0x7194633/keyt5-large"):
+    global tokenizer, model
+    print("Загрузка токенизатора...")
+    tokenizer = T5Tokenizer.from_pretrained(model_name, legacy=False)
+    print("Токенизатор инициализирован")
+    print(f"Загрузка модели {model_name}")
+    model = T5ForConditionalGeneration.from_pretrained(model_name)
+    print(f"Модель {model_name} инициализирована")
 
 # Предзагрузка моделей для доступных языков
 lang_models = {
@@ -9,6 +24,8 @@ lang_models = {
     "ru": "ru_core_news_lg",
 }
 
+
+# noinspection PyCallingNonCallable
 def process_text(input_text: str, lang: str, top_n: int = 20) -> List[str]:
     """
     Обработка текста: определение модели языка или перевод на английский,
@@ -22,33 +39,25 @@ def process_text(input_text: str, lang: str, top_n: int = 20) -> List[str]:
     Returns:
         List[str]: Список ключевых слов на исходном языке и их переводов на русский.
     """
-    translator_to_english = GoogleTranslator(source=lang, target="en")
-    translator_to_russian = GoogleTranslator(source="en", target="ru")
-    translator_to_original = GoogleTranslator(source="en", target=lang)
 
-    if lang in lang_models:
-        nlp = spacy.load(lang_models[lang])
-        doc = nlp(input_text)
+    if lang != "ru":
+        text = GoogleTranslator(source=lang, target="ru").translate(input_text)
+        print("Translated text")
     else:
-        translated_text = translator_to_english.translate(input_text)
-        nlp = spacy.load(lang_models["en"])
-        doc = nlp(translated_text)
+        text = input_text
+        print("Loaded text")
 
-    keywords = [token.lemma_ for token in doc if (token.pos_ in {"NOUN", "ADJ", "VERB"} and not token.is_stop
-                                                  and token.lemma_ != "-")]
-    print(1, keywords)
+    inputs = tokenizer(text, return_tensors='pt', truncation=True, max_length=4096)
+    print("Tokenized text")
+    with torch.no_grad():
+        print("Doing something with text")
+        hypotheses = model.generate(**inputs, num_beams=5, top_p=.5, max_length=64)
+        print("Finished doing something with text")
+    s = tokenizer.decode(hypotheses[0], skip_special_tokens=True)
+    print("S:", s)
+    print("Extracted keywords")
+    s = s.replace('; ', ';').replace(' ;', ';').lower().split(';')[:-1]
+    s = [el for el, _ in groupby(s)]
+    print("Returning keywords")
 
-    keyword_counts = Counter(keywords)
-    most_common_keywords = [word for word, _ in keyword_counts.most_common(top_n)]
-
-    translated_keywords = [translator_to_russian.translate(word) for word in most_common_keywords]
-    print(2, translated_keywords)
-
-    if lang not in lang_models:
-        original_keywords = [translator_to_original.translate(word) for word in most_common_keywords]
-    else:
-        original_keywords = most_common_keywords
-
-    print(3, original_keywords + translated_keywords)
-    # Возвращаем список ключевых слов на исходном языке и на русском
-    return list(set(original_keywords + translated_keywords))
+    return s

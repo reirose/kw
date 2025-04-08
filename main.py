@@ -10,11 +10,13 @@ from fastapi.staticfiles import StaticFiles
 from bin.data_processing import get_data
 from bin.db_init import client
 from bin.init import app, templates, files
+from bin.text_processing import initialize_model
 from bin.upload_file import upload_file, UploadResponse
 
 
 @app.on_event("startup")
 async def startup() -> None:
+    await initialize_model()
     print("App running")
 
 

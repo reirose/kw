@@ -6,8 +6,7 @@ from PIL import Image
 import pytesseract
 import openpyxl
 import PyPDF2
-# import os
-from docx import Document
+import docx
 from bs4 import BeautifulSoup
 
 # Путь к локальному файлу Tesseract
@@ -35,19 +34,19 @@ def detect_text_language(image_path):
 
 
 def extract_text_from_docx(file_path):
-    try:
-        document = Document(file_path)
+    # try:
+    document = docx.Document(file_path)
 
-        # Извлекаем текст из каждого параграфа
-        text = []
-        for paragraph in document.paragraphs:
-            text.append(paragraph.text)
+    # Извлекаем текст из каждого параграфа
+    text = []
+    for paragraph in document.paragraphs:
+        text.append(paragraph.text)
 
-        # Объединяем текст в одну строку
-        return "\n".join(text)
-    except Exception as e:
-        print("Error while extracting text from docx:", e)
-        return ""
+    # Объединяем текст в одну строку
+    return "\n".join(text)
+    # except Exception as e:
+    #     print("Error while extracting text from docx:", e)
+    #     return ""
 
 
 def extract_text_from_excel(file_path):
